@@ -1,0 +1,56 @@
+<Config>
+  <CustomLayout>Layout.xml</CustomLayout>
+  <TimeZone>Romance Standard Time</TimeZone>
+  <RemoveApps>
+    <App>Microsoft.BingWeather</App>
+    <App>Microsoft.DesktopAppInstaller</App>
+    <App>Microsoft.Getstarted</App>
+    <App>Microsoft.Messaging</App>
+    <App>Microsoft.Microsoft3DViewer</App>
+    <App>Microsoft.MicrosoftOfficeHub</App>
+    <App>Microsoft.MicrosoftSolitaireCollection</App>
+    <App>Microsoft.MixedReality.Portal</App>
+    <App>Microsoft.OneConnect</App>
+    <App>Microsoft.Print3D</App>
+    <App>Microsoft.SkypeApp</App>
+    <App>microsoft.windowscommunicationsapps</App>
+    <App>Microsoft.WindowsFeedbackHub</App>
+    <App>Microsoft.XboxApp</App>
+    <App>Microsoft.YourPhone</App>
+    <App>Microsoft.ZuneMusic</App>
+    <App>Microsoft.ZuneVideo</App>
+  </RemoveApps>
+  <OneDriveSetup>https://go.microsoft.com/fwlink/?linkid=844652</OneDriveSetup>
+  <AddFeatures>
+    <!-- 
+    If you do add a language pack, make sure you add these language add-ons for each one or add the Cab files to the LPs folder.
+    <Feature>Language.Basic~~~es-ES~0.0.1.0</Feature>
+    <Feature>Language.Fonts.PanEuropeanSupplementalFonts~~~~0.0.1.0</Feature>
+    <Feature>Language.Handwriting~~~es-ES~0.0.1.0</Feature>
+    <Feature>Language.OCR~~~es-ES~0.0.1.0</Feature>
+    <Feature>Language.Speech~~~es-ES~0.0.1.0</Feature>
+    <Feature>Language.TextToSpeech~~~es-ES~0.0.1.0</Feature>
+    <Feature>Language.Basic~~~fr-FR~0.0.1.0</Feature>
+    <Feature>Language.Fonts.PanEuropeanSupplementalFonts~~~~0.0.1.0</Feature>
+    <Feature>Language.Handwriting~~~fr-FR~0.0.1.0</Feature>
+    <Feature>Language.OCR~~~fr-FR~0.0.1.0</Feature>
+    <Feature>Language.Speech~~~fr-FR~0.0.1.0</Feature>
+    <Feature>Language.TextToSpeech~~~fr-FR~0.0.1.0</Feature>
+    -->
+    <Feature>Language.Fonts.PanEuropeanSupplementalFonts~~~~0.0.1.0</Feature>
+    <!-- <Feature>NetFX3~~~~</Feature> -->
+  </AddFeatures>
+  <!-- If you want to set a language, customize and reference this file: <Language>Language.xml</Language> -->
+  <Language>Language_FR.xml</Language>
+  <DefaultApps>Associations.xml</DefaultApps>
+  <RegisteredOwner>Owner</RegisteredOwner>
+  <RegisteredOrganization>Organization</RegisteredOrganization>
+  <OEMInfo>
+    <!-- <Manufacturer>Dynamic query</Manufacturer> -->
+    <!-- <Model>Dynamic query</Model> -->
+    <Logo>Dell.bmp</Logo>
+    <SupportPhone>tbd</SupportPhone>
+    <SupportHours>tbd</SupportHours>
+    <SupportURL>https://www.dell.com/support</SupportURL>
+  </OEMInfo>
+</Config>
