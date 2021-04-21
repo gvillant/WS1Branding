@@ -10,9 +10,20 @@
         <gs:MUIFallback Value="en-US" /> 
     </gs:MUILanguagePreferences> 
 
+    <!-- GeoID -->  
+    <gs:LocationPreferences> 
+        <gs:GeoID Value="84"/>
+    </gs:LocationPreferences>
+    
+    <!-- input preferences -->
+    <gs:InputPreferences>
+        <gs:InputLanguageID Action="add" ID="040c:0000040c" Default="true"/>
+        <gs:InputLanguageID Action="remove" ID="0409:00000409"/>
+    </gs:InputPreferences>
+
     <!--User Locale-->
     <gs:UserLocale> 
-        <gs:Locale Name="fr-FR" SetAsCurrent="true" ResetAllSettings="false"/>
+        <gs:Locale Name="fr-FR" SetAsCurrent="true" ResetAllSettings="true"/>
     </gs:UserLocale>
 
 </gs:GlobalizationServices>  
