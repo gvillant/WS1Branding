@@ -86,6 +86,7 @@ Get-ChildItem "$($installFolder)LPs" -Filter *.cab | % {
 # STEP 7: Change language
 if ($config.Config.Language) {
 	Write-Host "Configuring language using: $($config.Config.Language)"
+	Write-Host "Command Line : $env:SystemRoot\System32\control.exe intl.cpl,,/f:$($installFolder)$($config.Config.Language)"
 	& $env:SystemRoot\System32\control.exe "intl.cpl,,/f:`"$($installFolder)$($config.Config.Language)`""
 }
 else {
