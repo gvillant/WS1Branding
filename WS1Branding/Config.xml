@@ -24,18 +24,13 @@
   <AddFeatures>
     <!-- 
     If you do add a language pack, make sure you add these language add-ons for each one or add the Cab files to the LPs folder.
-    <Feature>Language.Basic~~~es-ES~0.0.1.0</Feature>
-    <Feature>Language.Fonts.PanEuropeanSupplementalFonts~~~~0.0.1.0</Feature>
-    <Feature>Language.Handwriting~~~es-ES~0.0.1.0</Feature>
-    <Feature>Language.OCR~~~es-ES~0.0.1.0</Feature>
-    <Feature>Language.Speech~~~es-ES~0.0.1.0</Feature>
-    <Feature>Language.TextToSpeech~~~es-ES~0.0.1.0</Feature>
+    Check https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/features-on-demand-language-fod
     <Feature>Language.Basic~~~fr-FR~0.0.1.0</Feature>
-    <Feature>Language.Fonts.PanEuropeanSupplementalFonts~~~~0.0.1.0</Feature>
     <Feature>Language.Handwriting~~~fr-FR~0.0.1.0</Feature>
     <Feature>Language.OCR~~~fr-FR~0.0.1.0</Feature>
     <Feature>Language.Speech~~~fr-FR~0.0.1.0</Feature>
     <Feature>Language.TextToSpeech~~~fr-FR~0.0.1.0</Feature>
+    <Feature>Language.Fonts.PanEuropeanSupplementalFonts~~~~0.0.1.0</Feature>
     -->
     <Feature>Language.Fonts.PanEuropeanSupplementalFonts~~~~0.0.1.0</Feature>
     <!-- <Feature>NetFX3~~~~</Feature> -->
