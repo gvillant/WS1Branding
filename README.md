@@ -1,3 +1,8 @@
+<p align="center">
+  <a href="https://github.com/gvillant/WS1Branding/releases"><img src="https://img.shields.io/github/release/gvillant/WS1Branding?style=plastic"></a>
+  <a href="https://github.com/gvillant/WS1Branding/releases"><img src="https://img.shields.io/github/release-date/gvillant/WS1Branding?style=plastic"></a>
+  </p>
+
 # 🖼️ WS1Branding
 This repository contains a sample PowerShell script that can be packaged into a WS1 app to customize Windows 10 devices.
 Forked from the script developped initially by Michael Niehaus for MS Intune https://github.com/mtniehaus/AutopilotBranding
