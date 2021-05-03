@@ -1,8 +1,8 @@
-# WS1Branding
+# 🖼️ WS1Branding
 This repository contains a sample PowerShell script that can be packaged into a WS1 app to customize Windows 10 devices.
 Forked from the script developped initially by Michael Niehaus for MS Intune https://github.com/mtniehaus/AutopilotBranding
 
-# Capabilities
+## ⚙️ Capabilities
 These customizations are currently supported:
 
 - Customize start menu layout. By default it will apply a simple two-icon layout (similiar to the default one on Windows 10 1903, but without the Office app).
@@ -18,18 +18,18 @@ These customizations are currently supported:
 - WORK IN PROGRESS : Rename Computer: Only for AD On-Prem scenario, the script will rename the computer as soon as it is able to communicate with AD domain controlers. Please follow the requirements explained here : https://oofhours.com/2020/05/19/renaming-autopilot-deployed-hybrid-azure-ad-join-devices/
 - REMOVED : Configure background image. A custom theme is deployed with a background image; the default user profile is then configured to use this theme. (Note that this won't work if the user is enabled for Enterprise State Roaming and has previously configured a background image.)
 
-# Using
+## 📲 Using
 setup the config.xml file and other required files, accordingly to the customizations you decided to implement : associations.xml, Language.xml, Layout.xml, Dell .bmp ...  
 
-# Requirements and Dependencies
+## ➕ Requirements and Dependencies
 for renaming AD objects, check requirements here : https://oofhours.com/2020/05/19/renaming-autopilot-deployed-hybrid-azure-ad-join-devices/
 
-# Building
+## 💾 Building
 Zip the folder (without "extra" root folder, ie the ps1 file script should be at the higher level) then create a WS1 application with following settings:
 - Install as device
 - Cmdline = powershell.exe -noprofile -executionpolicy bypass -file .\WS1Branding.ps1
 - Detection method: file exists : *%ProgramData%\Airwatch\WS1Branding\WS1Branding.ps1.tag*
 - Uninstall : cmd.exe /c del %ProgramData%\Airwatch\WS1Branding\WS1Branding.ps1.tag
 
-
+## ✌ Others 
 See https://oofhours.com/2020/05/18/two-for-one-updated-autopilot-branding-and-update-os-scripts/ for more information.
