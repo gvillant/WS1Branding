@@ -47,5 +47,6 @@
     <SupportPhone>tbd</SupportPhone>
     <SupportHours>tbd</SupportHours>
     <SupportURL>https://www.dell.com/support</SupportURL>
-  </OEMInfo>
+  </OEMInfo>     
+  <UpdateOS>False</UpdateOS> <!-- This feature is not supported with Dell Connected Provisioning -->
 </Config>

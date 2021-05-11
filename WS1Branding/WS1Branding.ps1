@@ -50,9 +50,9 @@ else {
 # STEP 3: Remove specified provisioned apps if they exist
 Write-Host "Removing specified in-box provisioned apps"
 $apps = Get-AppxProvisionedPackage -online
-$config.Config.RemoveApps.App | % {
+$config.Config.RemoveApps.App | ForEach-Object {
 	$current = $_
-	$apps | ? {$_.DisplayName -eq $current} | % {
+	$apps | Where-Object {$_.DisplayName -eq $current} | ForEach-Object {
 		Write-Host "Removing provisioned app: $current"
 		$_ | Remove-AppxProvisionedPackage -Online | Out-Null
 	}
@@ -78,7 +78,7 @@ Write-Host "Turning off (old) Edge desktop shortcut"
 reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v DisableEdgeDesktopShortcutCreation /t REG_DWORD /d 1 /f /reg:64 | Out-Host
 
 # STEP 6: Add language packs
-Get-ChildItem "$($installFolder)LPs" -Filter *.cab | % {
+Get-ChildItem "$($installFolder)LPs" -Filter *.cab | ForEach-Object {
 	Write-Host "Adding language pack: $($_.FullName)"
 	Add-WindowsPackage -Online -NoRestart -PackagePath $_.FullName
 }
@@ -101,7 +101,7 @@ if ($currentWU -eq 1)
 	Set-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU"  -Name "UseWuServer" -Value 0
 	Restart-Service wuauserv
 }
-$config.Config.AddFeatures.Feature | % {
+$config.Config.AddFeatures.Feature | ForEach-Object {
 	Write-Host "Adding Windows feature: $_"
 	Add-WindowsCapability -Online -Name $_
 }
@@ -169,4 +169,39 @@ reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Network\NewNetworkWindowOff" 
 Write-Host "Turning off Edge desktop icon"
 reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\EdgeUpdate" /v "CreateDesktopShortcutDefault" /t REG_DWORD /d 0 /f /reg:64 | Out-Host
 
+# STEP 14: Update OS 
+if ($($config.Config.UpdateOS) -eq "True") 
+{
+	# Main logic
+	$needReboot = $false
+	Write-Host "UpdateOS config item is set to: $($config.Config.UpdateOS) then installing updates ..."
+
+	# Load module from PowerShell Gallery
+	$null = Install-PackageProvider -Name NuGet -Force
+	$null = Install-Module PSWindowsUpdate -Force
+	Import-Module PSWindowsUpdate
+
+	# Install all available updates
+	Get-WindowsUpdate -Install -IgnoreUserInput -AcceptAll -WindowsUpdate -IgnoreReboot | Select-Object Title, KB, Result | Format-Table
+	$needReboot = (Get-WURebootStatus -Silent).RebootRequired
+
+	# Check return code
+	if ($needReboot)
+	{
+		Write-Host "Windows Update indicated that a reboot is needed."
+	}
+	else
+	{
+		Write-Host "Windows Update indicated that no reboot is required."
+	}
+
+	# For whatever reason, the reboot needed flag is not always being properly set.  So we always want to force a reboot.
+
+		Write-Host "Exiting with return code 3010 to indicate a soft reboot is needed."
+		Stop-Transcript
+		Exit 3010
+}
+else {
+	Write-Host "UpdateOS config item is set to: $($config.Config.UpdateOS)"
+}
 Stop-Transcript
