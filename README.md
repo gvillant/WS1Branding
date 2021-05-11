@@ -21,6 +21,7 @@ These customizations are currently supported:
 - Configure default apps. Import a list of file associations (as created by manually configuring the associations that you want and then using "DISM /Online /Export-DefaultAppAssociations:C:\Associations.xml" to export those settings) that should replace the default app associations. (Note that even though an example is included from a customized Windows 10 1903 image, making IE 11 the default browser, you should replace this file with your own exported version. Also, do not edit the file that you exported, e.g. to remove entries that you didn't change.)
 - Configure the "OEM" support information, you can check on settings/about
 - WORK IN PROGRESS : Rename Computer: Only for AD On-Prem scenario, the script will rename the computer as soon as it is able to communicate with AD domain controlers. Please follow the requirements explained here : https://oofhours.com/2020/05/19/renaming-autopilot-deployed-hybrid-azure-ad-join-devices/
+- WORK IN PROGRESS : Update OS using PSWindowsUpdate Powershell module. If enabled, the script will exit with code 3010. 
 - REMOVED : Configure background image. A custom theme is deployed with a background image; the default user profile is then configured to use this theme. (Note that this won't work if the user is enabled for Enterprise State Roaming and has previously configured a background image.)
 
 ## 📲 Using
