@@ -8,15 +8,17 @@ if ("$env:PROCESSOR_ARCHITEW6432" -ne "ARM64")
     }
 }
 
+$WorkingDir = "$($env:ProgramData)\Airwatch\WS1Branding"
+
 # Create a tag file just so WS1 knows this was installed
-if (-not (Test-Path "$($env:ProgramData)\Airwatch\WS1Branding"))
+if (-not (Test-Path $WorkingDir))
 {
-    Mkdir "$($env:ProgramData)\Airwatch\WS1Branding"
+    Mkdir $WorkingDir
 }
-Set-Content -Path "$($env:ProgramData)\Airwatch\WS1Branding\WS1Branding.ps1.tag" -Value "Installed"
+Set-Content -Path "$WorkingDir\WS1Branding.ps1.tag" -Value "Installed"
 
 # Start logging
-Start-Transcript "$($env:ProgramData)\Airwatch\WS1Branding\WS1Branding.log"
+Start-Transcript "$WorkingDir\WS1Branding.log"
 
 # PREP: Load the Config.xml
 $installFolder = "$PSScriptRoot\"
@@ -88,29 +90,57 @@ if ($config.Config.Language) {
 	Write-Host "Configuring language using: $($config.Config.Language)"
 	Write-Host "Command Line : $env:SystemRoot\System32\control.exe intl.cpl,,/f:$($installFolder)$($config.Config.Language)"
 	& $env:SystemRoot\System32\control.exe "intl.cpl,,/f:`"$($installFolder)$($config.Config.Language)`""
-}
+
+    # With WS1 Dropship online, language settings should be applied after the provisioning step because of sysprep resealing. So we will use a scheduled task to apply the xml and reboot the device before the first user logon.  
+	# Check to see if already scheduled
+    $existingTask = Get-ScheduledTask -TaskName "WS1BrandingLanguage" -ErrorAction SilentlyContinue
+    if ($existingTask -ne $null)
+    {
+        Write-Host "Scheduled task already exists."
+    }
+	else { 
+    	# Copy WS1BrandingLanguage script and xml to a safe place if not already there
+		if (-not (Test-Path "$WorkingDir\WS1BrandingLanguage.ps1"))
+		{
+			Copy-Item "$PSScriptRoot\WS1BrandingLanguage.ps1" "$WorkingDir\WS1BrandingLanguage.ps1" -Force
+			Copy-Item $($installFolder)$($config.Config.Language) "$WorkingDir\Language.xml" -Force
+		}
+
+		# Create the scheduled task action
+		$action = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument "-NoProfile -ExecutionPolicy bypass -WindowStyle Hidden -File $WorkingDir\WS1BrandingLanguage.ps1"
+
+		# Create the scheduled task trigger
+		#$timespan = New-Timespan -minutes 5
+		$triggers = @()
+		$triggers += New-ScheduledTaskTrigger -AtStartup #-RandomDelay $timespan
+		
+		# Register the scheduled task
+		Register-ScheduledTask -User SYSTEM -Action $action -Trigger $triggers -TaskName "WS1BrandingLanguage" -Description "WS1BrandingLanguage" -Force
+		Write-Host "Scheduled task created."
+		}
+	}
 else {
 	Write-Host "Language config item does not exist"
-}
+	}
 
-# STEP 8: Add features on demand ONLINE
-$currentWU = (Get-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU" -ErrorAction Ignore).UseWuServer
-if ($currentWU -eq 1)
-{
-	Write-Host "Turning off WSUS"
-	Set-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU"  -Name "UseWuServer" -Value 0
-	Restart-Service wuauserv
-}
-$config.Config.AddFeatures.Feature | ForEach-Object {
-	Write-Host "Adding Windows feature: $_"
-	Add-WindowsCapability -Online -Name $_
-}
-if ($currentWU -eq 1)
-{
-	Write-Host "Turning on WSUS"
-	Set-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU"  -Name "UseWuServer" -Value 1
-	Restart-Service wuauserv
-}
+	# STEP 8: Add features on demand ONLINE
+	$currentWU = (Get-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU" -ErrorAction Ignore).UseWuServer
+	if ($currentWU -eq 1)
+	{
+		Write-Host "Turning off WSUS"
+		Set-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU"  -Name "UseWuServer" -Value 0
+		Restart-Service wuauserv
+	}
+	$config.Config.AddFeatures.Feature | ForEach-Object {
+		Write-Host "Adding Windows feature: $_"
+		Add-WindowsCapability -Online -Name $_
+	}
+	if ($currentWU -eq 1)
+	{
+		Write-Host "Turning on WSUS"
+		Set-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU"  -Name "UseWuServer" -Value 1
+		Restart-Service wuauserv
+	}
 
 # STEP 9: Customize default apps
 if ($config.Config.DefaultApps) {
