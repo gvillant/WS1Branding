@@ -35,7 +35,6 @@ else {
 	Write-Host "CustomLayout config item does not exist"
 }
 
-
 # STEP 2: Set time zone (if specified)
 if ($config.Config.TimeZone) {
 	Write-Host "Setting time zone: $($config.Config.TimeZone)"
@@ -85,45 +84,41 @@ Get-ChildItem "$($installFolder)LPs" -Filter *.cab | ForEach-Object {
 	Add-WindowsPackage -Online -NoRestart -PackagePath $_.FullName
 }
 
-# STEP 7: Change language
+# STEP 7: Set language and regional settings.
+# With WS1 Dropship online, language settings should be applied after the provisioning step because of sysprep resealing. So we will use a scheduled task to apply the xml and reboot the device before the first user logon.  
 if ($config.Config.Language) {
 	Write-Host "Configuring language using: $($config.Config.Language)"
 	Write-Host "Command Line : $env:SystemRoot\System32\control.exe intl.cpl,,/f:$($installFolder)$($config.Config.Language)"
 	& $env:SystemRoot\System32\control.exe "intl.cpl,,/f:`"$($installFolder)$($config.Config.Language)`""
 
-    # With WS1 Dropship online, language settings should be applied after the provisioning step because of sysprep resealing. So we will use a scheduled task to apply the xml and reboot the device before the first user logon.  
-	# Check to see if already scheduled
+    # Check to see if already scheduled
     $existingTask = Get-ScheduledTask -TaskName "WS1BrandingLanguage" -ErrorAction SilentlyContinue
     if ($existingTask -ne $null)
     {
         Write-Host "Scheduled task already exists."
     }
 	else { 
-    	# Copy WS1BrandingLanguage script and xml to a safe place if not already there
-		if (-not (Test-Path "$WorkingDir\WS1BrandingLanguage.ps1"))
-		{
-			Copy-Item "$PSScriptRoot\WS1BrandingLanguage.ps1" "$WorkingDir\WS1BrandingLanguage.ps1" -Force
-			Copy-Item $($installFolder)$($config.Config.Language) "$WorkingDir\Language.xml" -Force
-		}
+    	# Copy WS1BrandingLanguage script and xml to $WorkingDir
+		Copy-Item "$PSScriptRoot\WS1BrandingLanguage.ps1" "$WorkingDir\WS1BrandingLanguage.ps1" -Force
+		Copy-Item "$PSScriptRoot\$($config.Config.Language)" "$WorkingDir\Language.xml" -Force
 
 		# Create the scheduled task action
 		$action = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument "-NoProfile -ExecutionPolicy bypass -WindowStyle Hidden -File $WorkingDir\WS1BrandingLanguage.ps1"
 
 		# Create the scheduled task trigger
-		#$timespan = New-Timespan -minutes 5
 		$triggers = @()
-		$triggers += New-ScheduledTaskTrigger -AtStartup #-RandomDelay $timespan
+		$triggers += New-ScheduledTaskTrigger -AtStartup
 		
 		# Register the scheduled task
 		Register-ScheduledTask -User SYSTEM -Action $action -Trigger $triggers -TaskName "WS1BrandingLanguage" -Description "WS1BrandingLanguage" -Force
 		Write-Host "Scheduled task created."
-		}
 	}
+}
 else {
 	Write-Host "Language config item does not exist"
 	}
 
-	# STEP 8: Add features on demand ONLINE
+# STEP 8: Add features on demand ONLINE
 	$currentWU = (Get-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU" -ErrorAction Ignore).UseWuServer
 	if ($currentWU -eq 1)
 	{
@@ -140,7 +135,7 @@ else {
 		Write-Host "Turning on WSUS"
 		Set-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU"  -Name "UseWuServer" -Value 1
 		Restart-Service wuauserv
-	}
+}
 
 # STEP 9: Customize default apps
 if ($config.Config.DefaultApps) {
@@ -226,7 +221,6 @@ if ($($config.Config.UpdateOS) -eq "True")
 	}
 
 	# For whatever reason, the reboot needed flag is not always being properly set.  So we always want to force a reboot.
-
 		Write-Host "Exiting with return code 3010 to indicate a soft reboot is needed."
 		Stop-Transcript
 		Exit 3010
