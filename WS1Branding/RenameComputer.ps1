@@ -3,32 +3,14 @@
 
 .VERSION 1.0
 
-.GUID 3b42d8c8-cda5-4411-a623-90d812a8e29e
+.AUTHOR Gaëtan Villant
 
-.AUTHOR Michael Niehaus
+.COPYRIGHT Michael Niehaus
 
-.COMPANYNAME Microsoft
-
-.COPYRIGHT
-
-.TAGS
-
-.LICENSEURI
-
-.PROJECTURI
-
-.ICONURI
-
-.EXTERNALMODULEDEPENDENCIES 
-
-.REQUIREDSCRIPTS
-
-.EXTERNALSCRIPTDEPENDENCIES
+.LICENSEURI under MIT license
 
 .RELEASENOTES
 Version 1.0: Initial version.
-
-.PRIVATEDATA
 
 #>
 
@@ -55,12 +37,12 @@ if ("$env:PROCESSOR_ARCHITEW6432" -ne "ARM64")
 # Create a tag file just so Intune knows this was installed
 if (-not (Test-Path "$($env:ProgramData)\Microsoft\RenameComputer"))
 {
-    Mkdir "$($env:ProgramData)\Microsoft\RenameComputer"
+    Mkdir "$($env:ProgramData)\Airwatch\WS1Branding"
 }
-Set-Content -Path "$($env:ProgramData)\Microsoft\RenameComputer\RenameComputer.ps1.tag" -Value "Installed"
+Set-Content -Path "$($env:ProgramData)\Airwatch\WS1Branding\RenameComputer.ps1.tag" -Value "Installed"
 
 # Initialization
-$dest = "$($env:ProgramData)\Microsoft\RenameComputer"
+$dest = "$($env:ProgramData)\Airwatch\WS1Branding"
 if (-not (Test-Path $dest))
 {
     mkdir $dest
