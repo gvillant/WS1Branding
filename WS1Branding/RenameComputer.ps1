@@ -134,7 +134,7 @@ else
     $triggers = @()
     $triggers += New-ScheduledTaskTrigger -Daily -At 9am
     $triggers += New-ScheduledTaskTrigger -AtLogOn -RandomDelay $timespan
-    $triggers += New-ScheduledTaskTrigger -AtStartup -RandomDelay $timespan
+    # $triggers += New-ScheduledTaskTrigger -AtStartup -RandomDelay $timespan # Commented out because this is blocking first user login with error "cannot find object in AD" 
     
     # Register the scheduled task
     Register-ScheduledTask -User SYSTEM -Action $action -Trigger $triggers -TaskName "RenameComputer" -Description "RenameComputer" -Force
