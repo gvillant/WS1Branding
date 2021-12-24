@@ -10,14 +10,16 @@
 .LICENSEURI under MIT license
 
 .RELEASENOTES
-Version 1.0: Initial version.
+Version 1.0: Initial version, forked from Michael Niehaus Intune script. 
+Version 1.1: 24/12/2021 : Improved Tag file detection. 
 
 #>
 
 <# 
 
 .DESCRIPTION 
- Rename the computer 
+ This script will rename the computer in a WS1 Drop Ship provisioning environment (AD on-prem) 
+ Modify the "Naming Convention" part to build your own, build the WS1 package and assign during the Drop Ship provisioning step.
 
 #> 
 
@@ -35,7 +37,7 @@ if ("$env:PROCESSOR_ARCHITEW6432" -ne "ARM64")
 }
 
 # Create a tag file just so Intune knows this was installed
-if (-not (Test-Path "$($env:ProgramData)\Microsoft\RenameComputer"))
+if (-not (Test-Path "$($env:ProgramData)\Airwatch\WS1Branding"))
 {
     Mkdir "$($env:ProgramData)\Airwatch\WS1Branding"
 }
@@ -49,7 +51,7 @@ if (-not (Test-Path $dest))
 }
 Start-Transcript "$dest\RenameComputer.log" -Append
 
-# Make sure we are already domain-joined
+# Make sure we are already domain-joined (Offline Domain Join has been processed)
 $goodToGo = $true
 $details = Get-ComputerInfo
 if (-not $details.CsPartOfDomain)
@@ -58,7 +60,7 @@ if (-not $details.CsPartOfDomain)
     $goodToGo = $false
 }
 
-# Make sure we have connectivity
+# Make sure we have connectivity to the Domain Controller
 $dcInfo = [ADSI]"LDAP://RootDSE"
 if ($dcInfo.dnsHostName -eq $null)
 {
@@ -68,21 +70,19 @@ if ($dcInfo.dnsHostName -eq $null)
 
 if ($goodToGo)
 {
-    # Get the new computer name
+    # Get the new computer name (modify the logic below to fit your own naming convention !) 
     $SerialNumber = (Get-WmiObject -Class Win32_Bios).SerialNumber
     $isLaptop = [bool](Get-WmiObject -Class Win32_SystemEnclosure | Where-Object ChassisTypes -in '{9}', '{10}', '{14}')
 
-    #$SerialNumber = "fjgkdfj-dsffds-gfsdg54-5434"
-
     $SerialNumberClean = ($SerialNumber -replace '-','')
     $SerialNumberClean = $SerialNumberClean.Substring($SerialNumberClean.Length - 7)
-    $Prefix = "LVCPFRPA"
+    $Prefix = "FR"
     
-<#  if ($isLaptop) {
-        $newName = $Prefix + "L-" + $SerialNumberClean }
-    else {
-        $newName = $Prefix + "D-" + $SerialNumberClean }
-#>
+    <#  if ($isLaptop) {
+            $newName = $Prefix + "L-" + $SerialNumberClean }
+        else {
+            $newName = $Prefix + "D-" + $SerialNumberClean }
+    #>
 
     $newName = $Prefix + $SerialNumberClean
 
@@ -94,20 +94,12 @@ if ($goodToGo)
     Disable-ScheduledTask -TaskName "RenameComputer" -ErrorAction Ignore
     Unregister-ScheduledTask -TaskName "RenameComputer" -Confirm:$false -ErrorAction Ignore
     Write-Host "Scheduled task unregistered."
-
-    # Make sure we reboot if still in ESP/OOBE by reporting a 1641 return code (hard reboot)
-    if ($details.CsUserName -match "defaultUser")
-    {
-        Write-Host "Exiting during ESP/OOBE with return code 1641"
-        Stop-Transcript
-        Exit 1641
-    }
-    else {
-        Write-Host "Initiating a restart in 10 minutes"
-        & shutdown.exe /g /t 600 /f /c "Restarting the computer due to a computer name change.  Save your work."
-        Stop-Transcript
-        Exit 0
-    }
+    
+    # Restart the Computer renaming to take effect. 
+    Write-Host "Initiating a restart in 10 minutes"
+    & shutdown.exe /g /t 600 /f /c "Restarting the computer due to a computer name change.  Save your work."
+    Stop-Transcript
+    Exit 0
 }
 else
 {
